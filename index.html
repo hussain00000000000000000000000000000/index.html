@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>موسوعة إيهاب الأعرجي | المنصة الرسمية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00f2ff;
+            --accent: #7000ff;
+            --shorts-accent: #ff0050;
+            --bg: #010208;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
+        body { 
+            background: var(--bg); 
+            color: #fff; 
+            overflow-x: hidden; 
+            min-height: 100vh;
+        }
+
+        #particles-js {
+            position: fixed; width: 100%; height: 100%; z-index: -1;
+            background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+        }
+
+        .sidebar {
+            position: fixed; top: 0; left: -320px; width: 300px; height: 100%;
+            background: rgba(5, 10, 20, 0.95); backdrop-filter: blur(25px);
+            z-index: 2500; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 80px 20px; border-right: 1px solid var(--primary);
+        }
+        .sidebar.open { left: 0; }
+        .sidebar-item {
+            padding: 15px; margin-bottom: 12px; border-radius: 15px; cursor: pointer;
+            transition: 0.3s; border: 1px solid transparent; font-weight: bold;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .sidebar-item:hover { 
+            background: rgba(0, 242, 255, 0.1); 
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateX(10px);
+        }
+
+        .menu-btn {
+            position: fixed; top: 25px; left: 25px; z-index: 3000;
+            background: var(--primary); color: #000; border: none; 
+            padding: 12px 25px; border-radius: 50px; cursor: pointer; 
+            font-weight: 900; box-shadow: 0 0 20px rgba(0,242,255,0.5);
+        }
+
+        .container { max-width: 1000px; margin: 0 auto; padding: 100px 20px; }
+        .page { display: none; animation: slideUp 0.6s ease-out; }
+        .active-page { display: block; }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+
+        .profile-card {
+            background: var(--glass); border-radius: 35px; padding: 50px 30px;
+            text-align: center; border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(15px); margin-bottom: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .profile-img { width: 140px; height: 140px; border-radius: 50%; border: 3px solid var(--primary); margin-bottom: 20px; padding: 5px; }
+        
+        .story-box {
+            background: rgba(255,255,255,0.03); border-radius: 25px; padding: 40px;
+            margin-bottom: 35px; border-right: 6px solid var(--primary);
+            line-height: 2.2; text-align: justify; backdrop-filter: blur(5px);
+        }
+        .story-box h2 { color: var(--primary); margin-bottom: 25px; font-size: 2.2rem; }
+        .story-box p { font-size: 1.25rem; color: #ddd; margin-bottom: 20px; }
+
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
+        .v-card {
+            background: #000; border-radius: 25px; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1); transition: 0.5s;
+            cursor: pointer;
+        }
+        .v-card:hover { transform: translateY(-10px); border-color: var(--primary); box-shadow: 0 0 30px rgba(0,242,255,0.3); }
+        .v-thumb { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
+        .v-title { padding: 20px; text-align: center; font-weight: bold; font-size: 1.1rem; color: #fff; }
+
+        .shorts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
+        .s-card {
+            background: #000; border-radius: 20px; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1); transition: 0.4s;
+            cursor: pointer; aspect-ratio: 9/16; position: relative;
+        }
+        .s-card:hover { transform: scale(1.05); border-color: var(--shorts-accent); box-shadow: 0 0 25px rgba(255,0,80,0.4); }
+        .s-thumb { width: 100%; height: 100%; object-fit: cover; }
+        .s-overlay {
+            position: absolute; bottom: 0; width: 100%; padding: 15px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.9));
+            text-align: center; font-weight: bold; font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="particles-js"></div>
+    <button class="menu-btn" onclick="toggleSidebar()">☰ القائمة</button>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-item" onclick="showPage('home')">🏠 الرئيسية</div>
+        <div class="sidebar-item" onclick="showPage('iraq')">🇮🇶 تاريخ العراق</div>
+        <div class="sidebar-item" onclick="showPage('mysteries')">🕵️ حوادث وغرائب</div>
+        <div class="sidebar-item" onclick="showPage('videos')">🎬 معرض الفيديوهات</div>
+        <div class="sidebar-item" onclick="showPage('shorts')">📱 قسم الشورتس</div>
+        <div class="sidebar-item" onclick="showPage('sociology')">👥 علم الاجتماع</div>
+        <div class="sidebar-item" onclick="showPage('politics')">📔 مذكرات سياسية</div>
+    </div>
+
+    <div id="home" class="page container active-page">
+        <div class="profile-card">
+            <img src="https://via.placeholder.com/150/00f2ff/000000?text=Ehab" class="profile-img">
+            <h1 style="font-size: 3rem; margin-bottom: 10px;">إيهاب الأعرجي</h1>
+            <p style="color: var(--primary); font-size: 1.5rem; font-weight: 900;">الباحث وصانع المحتوى الوثائقي</p>
+            <p style="margin-top: 25px; color: #ccc;">خبير في كشف كواليس التاريخ والسياسة. هذه المنصة هي الأرشيف الرسمي لتوثيق القصص الغامضة والحقائق المغيبة.</p>
+        </div>
+
+        <div class="profile-card" style="border-color: var(--accent);">
+            <img src="https://via.placeholder.com/150/7000ff/ffffff?text=Hussain" class="profile-img" style="border-color: var(--accent);">
+            <h2 style="font-size: 2.5rem;">المطور حسين صادق</h2>
+            <p style="color: var(--accent); font-size: 1.3rem; font-weight: 900;">مهندس البرمجيات والمصمم</p>
+            <p style="margin-top: 20px; color: #ccc;">تم تطوير هذه المنصة بأحدث التقنيات لتقديم تجربة بصرية ومعلوماتية فريدة تليق بمتابعينا.</p>
+            <div style="margin-top: 30px;">
+                <a href="https://wa.me/9647878544315" style="color: var(--accent); text-decoration: none; border: 2px solid var(--accent); padding: 12px 30px; border-radius: 50px; font-weight: 900;">تواصل مع المطور 🚀</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="videos" class="page container">
+        <h1 style="text-align: center; color: var(--primary); margin-bottom: 50px; font-size: 2.5rem;">🎬 الأرشيف المرئي</h1>
+        <div class="video-grid" id="v-grid"></div>
+    </div>
+
+    <div id="shorts" class="page container">
+        <h1 style="text-align: center; color: var(--shorts-accent); margin-bottom: 50px; font-size: 2.5rem;">📱 يوتيوب شورتس</h1>
+        <div class="shorts-grid" id="s-grid"></div>
+    </div>
+
+    <div id="iraq" class="page container">
+        <div class="story-box">
+            <h2>مجزرة قصر الرحاب: نهاية الملكية</h2>
+            <p>في فجر الرابع عشر من تموز عام 1958، لم تكن بغداد تدرك أنها على موعد مع حدث سيغير وجهها للأبد...</p>
+        </div>
+    </div>
+
+    <div id="mysteries" class="page container">
+        <div class="story-box">
+            <h2>لغز ممر دياتلوف</h2>
+            <p>في عام 1959، توجه تسعة متزلجين إلى جبال الأورال...</p>
+        </div>
+    </div>
+
+    <div id="sociology" class="page container"><div class="story-box"><h2>سيكولوجية الجماهير</h2><p>تحليل سلوك المجتمعات في الأزمات...</p></div></div>
+    <div id="politics" class="page container"><div class="story-box"><h2>مذكرات سياسية</h2><p>خبايا السياسة العراقية...</p></div></div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+            document.getElementById(id).classList.add('active-page');
+            if(window.innerWidth < 768) document.getElementById('sidebar').classList.remove('open');
+            window.scrollTo(0,0);
+        }
+
+        const videos = [
+            { id: "KdPAFDKb2NI", title: "لغز يأجوج ومأجوج" },
+            { id: "h2zOTVbdKKQ", title: "تاريخ الفايكنغ" },
+            { id: "o8BKz-BHVuo", title: "قبائل الكورواي" },
+            { id: "_wIWSgCeNIU", title: "القصة الكاملة لليمن" },
+            { id: "tVSi8GXgkmk", title: "أسرار التاريخ المفقود" }
+        ];
+
+        const shortsList = [
+            { id: "6vV18t7yV-8", title: "سر العباقرة" },
+            { id: "N6Hl8Q7mX4k", title: "حقائق صادمة" },
+            { id: "v_78BfM7M0o", title: "معلومات سريعة" }
+        ];
+
+        const grid = document.getElementById('v-grid');
+        videos.forEach(v => {
+            grid.innerHTML += `
+                <div class="v-card" onclick="window.open('https://youtube.com/watch?v=${v.id}')">
+                    <img class="v-thumb" src="https://i3.ytimg.com/vi/${v.id}/mqdefault.jpg">
+                    <div class="v-title">${v.title}</div>
+                </div>
+            `;
+        });
+
+        const sGrid = document.getElementById('s-grid');
+        shortsList.forEach(s => {
+            sGrid.innerHTML += `
+                <div class="s-card" onclick="window.open('https://youtube.com/shorts/${s.id}')">
+                    <img class="s-thumb" src="https://i3.ytimg.com/vi/${s.id}/hqdefault.jpg">
+                    <div class="s-overlay">${s.title}</div>
+                </div>
+            `;
+        });
+
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 100, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": "#00f2ff" },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.5, "random": true },
+                "size": { "value": 3, "random": true },
+                "line_linked": { "enable": true, "distance": 150, "color": "#00f2ff", "opacity": 0.2, "width": 1 },
+                "move": { "enable": true, "speed": 1.5, "direction": "none", "random": true, "straight": false, "out_mode": "out" }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": { "onhover": { "enable": true, "mode": "grab" } }
+            }
+        });
+    </script>
+</body>
+</html>
