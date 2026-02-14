@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة موادُك | التطوير الاحترافي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0e3d59; --accent: #d4af37; --bg: #f8fafb;
+            --white: #ffffff; --green: #2ecc71; --red: #e74c3c;
+            --text: #2c3e50; --shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; padding-bottom: 80px; direction: rtl; }
+        
+        header { 
+            background: var(--primary); color: white; padding: 15px; text-align: center; 
+            border-bottom: 4px solid var(--accent); position: sticky; top: 0; z-index: 1000;
+        }
+        .eng-section { background: #111; color: var(--accent); margin: 10px; padding: 10px; border-radius: 8px; text-align: center; font-size: 14px; font-weight: bold; }
+
+        .tabs-container { 
+            display: flex; overflow-x: auto; background: white; padding: 12px; gap: 8px; 
+            box-shadow: var(--shadow); position: sticky; top: 65px; z-index: 999;
+        }
+        .tabs-container::-webkit-scrollbar { display: none; }
+        .tab-btn { 
+            background: #f0f2f5; border: none; padding: 8px 18px; border-radius: 20px; 
+            font-family: 'Cairo'; font-size: 12px; font-weight: bold; white-space: nowrap; cursor: pointer; 
+        }
+        .tab-btn.active { background: var(--primary); color: white; }
+
+        .view-section { display: none; padding: 15px; animation: fadeIn 0.3s; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .card { background: white; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid #eee; position: relative; }
+        .card img { width: 100%; height: 120px; object-fit: cover; }
+        .card-body { padding: 10px; }
+        .p-name { font-size: 12px; font-weight: bold; height: 35px; overflow: hidden; }
+        .p-price-num { color: var(--red); font-weight: 900; font-size: 15px; display: block; }
+        .p-price-text { color: #2980b9; font-size: 10px; font-weight: bold; display: block; }
+
+        /* --- تحسين واجهة إضافة المواد --- */
+        .form-container { background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow); max-width: 500px; margin: 0 auto; }
+        .input-group { position: relative; margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 13px; font-weight: bold; color: var(--primary); margin-bottom: 5px; }
+        
+        input, select { 
+            width: 100%; padding: 14px; border: 1px solid #e0e0e0; border-radius: 12px; 
+            font-family: 'Cairo'; outline: none; background: #fafafa; font-size: 14px;
+            transition: 0.3s; box-sizing: border-box;
+        }
+        input:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px rgba(14, 61, 89, 0.1); }
+
+        .upload-area { 
+            border: 2px dashed #d0d7de; padding: 25px; text-align: center; border-radius: 15px; 
+            cursor: pointer; background: #fdfdfd; transition: 0.3s; margin-top: 10px;
+        }
+        .upload-area:hover { border-color: var(--primary); background: #f4f7f9; }
+        .upload-area i { font-size: 30px; display: block; margin-bottom: 8px; }
+        #imagePreview { width: 120px; height: 120px; object-fit: cover; margin: 15px auto 0; border-radius: 12px; border: 2px solid #eee; display: none; }
+
+        .btn-submit { 
+            background: var(--green); color: white; border: none; width: 100%; padding: 16px; 
+            border-radius: 12px; font-weight: 900; font-size: 16px; cursor: pointer; 
+            margin-top: 20px; box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
+        }
+
+        /* --- بقية التنسيقات --- */
+        .auth-container { background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow); max-width: 500px; margin: 10px auto; text-align: center; }
+        .role-selector { display: flex; gap: 5px; margin-bottom: 15px; background: #f0f2f5; padding: 5px; border-radius: 10px; }
+        .role-btn { flex: 1; padding: 8px; font-size: 11px; border: none; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
+        .role-btn.active { background: var(--primary); color: white; }
+        .dynamic-fields { padding: 10px; background: #f9f9f9; border-radius: 10px; margin-bottom: 10px; border: 1px dashed #ccc; text-align: right; }
+        
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #eee; z-index: 2000; }
+        .nav-item { text-align: center; font-size: 10px; color: #999; cursor: pointer; flex: 1; }
+        .nav-item.active { color: var(--primary); font-weight: bold; }
+        .nav-item span { font-size: 20px; display: block; }
+        .delete-btn { position: absolute; top: 5px; left: 5px; background: var(--red); color: white; border: none; border-radius: 5px; padding: 3px 7px; font-size: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<header><h1>موادُك <span>العراق</span></h1></header>
+<div class="eng-section">📐 منصة المهندسين والموردين والزبائن</div>
+
+<div id="homeView" class="view-section active">
+    <div class="tabs-container" id="tabsMenu">
+        <button class="tab-btn active" onclick="filterData('الكل', this)">الكل</button>
+        <button class="tab-btn" onclick="filterData('بناء', this)">بناء</button>
+        <button class="tab-btn" onclick="filterData('تسليح', this)">تسليح</button>
+        <button class="tab-btn" onclick="filterData('سيراميك', this)">سيراميك</button>
+        <button class="tab-btn" onclick="filterData('صحيات', this)">صحيات</button>
+        <button class="tab-btn" onclick="filterData('كهرباء', this)">كهرباء</button>
+        <button class="tab-btn" onclick="filterData('أصباغ', this)">أصباغ</button>
+        <button class="tab-btn" onclick="filterData('إنشائية', this)">إنشائية</button>
+        <button class="tab-btn" onclick="filterData('مبيدات', this)">مبيدات</button>
+        <button class="tab-btn" onclick="filterData('شبابيك', this)">شبابيك</button>
+    </div>
+    <div class="grid" id="mainGrid" style="margin-top:15px;"></div>
+</div>
+
+<div id="supplierView" class="view-section">
+    <div class="form-container">
+        <h3 style="margin:0 0 20px; text-align: center; color: var(--primary);">📥 إضافة مادة جديدة للسوق</h3>
+        
+        <div class="input-group">
+            <label>📦 اسم المادة</label>
+            <input type="text" id="pName" placeholder="مثال: سمنت مقاوم للرطوبة">
+        </div>
+
+        <div class="input-group">
+            <label>💰 السعر (دينار عراقي)</label>
+            <input type="number" id="pPrice" placeholder="أدخل السعر بالأرقام فقط">
+        </div>
+
+        <div class="input-group">
+            <label>📂 تصنيف المادة</label>
+            <select id="pCat">
+                <option>بناء</option><option>تسليح</option><option>سيراميك</option>
+                <option>صحيات</option><option>كهرباء</option><option>أصباغ</option>
+                <option>إنشائية</option><option>مبيدات</option><option>شبابيك</option>
+            </select>
+        </div>
+
+        <div class="upload-area" onclick="document.getElementById('pImgFile').click()">
+            <span style="font-size: 24px; display: block;">📸</span>
+            <span style="font-weight: bold; color: #555;">اضغط لرفع صورة المنتج</span>
+            <input type="file" id="pImgFile" accept="image/*" style="display:none" onchange="previewImage(this)">
+            <img id="imagePreview" src="">
+        </div>
+
+        <button class="btn-submit" onclick="addProduct()">نشر في السوق العراقي</button>
+    </div>
+
+    <h3 style="margin:30px 0 15px; border-right: 4px solid var(--accent); padding-right: 10px;">🛠️ موادك المنشورة حالياً</h3>
+    <div class="grid" id="adminGrid"></div>
+</div>
+
+<div id="authView" class="view-section">
+    <div class="auth-container">
+        <div class="role-selector">
+            <button class="role-btn active" onclick="setRole('customer', this)">زبون</button>
+            <button class="role-btn" onclick="setRole('engineer', this)">مهندس</button>
+            <button class="role-btn" onclick="setRole('supplier', this)">مورد مواد</button>
+        </div>
+        <input type="text" placeholder="الاسم الكامل">
+        <input type="tel" placeholder="رقم الهاتف">
+        <button class="btn-submit">حفظ البيانات</button>
+    </div>
+</div>
+
+<div id="adminOrdersView" class="view-section">
+    <h3 style="border-right: 4px solid var(--accent); padding-right: 10px;">📥 طلبات الزبائن الواردة</h3>
+    <div id="ordersList"></div>
+</div>
+
+<div class="bottom-nav">
+    <div class="nav-item active" onclick="switchView('homeView', this)"><span>🏠</span>الرئيسية</div>
+    <div class="nav-item" onclick="switchView('supplierView', this)"><span>⚙️</span>الإدارة</div>
+    <div class="nav-item" onclick="switchView('adminOrdersView', this)"><span>📋</span>الطلبات</div>
+    <div class="nav-item" onclick="switchView('authView', this)"><span>👤</span>حسابي</div>
+</div>
+
+<script>
+    let state = {
+        products: JSON.parse(localStorage.getItem('m_prods')) || [],
+        orders: JSON.parse(localStorage.getItem('m_ords')) || [],
+        tempImg: ""
+    };
+
+    function save() {
+        localStorage.setItem('m_prods', JSON.stringify(state.products));
+        localStorage.setItem('m_ords', JSON.stringify(state.orders));
+    }
+
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            let r = new FileReader();
+            r.onload = e => {
+                const preview = document.getElementById('imagePreview');
+                preview.src = e.target.result;
+                preview.style.display = "block";
+                state.tempImg = e.target.result;
+            };
+            r.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function formatTxt(num) {
+        let m = Math.floor(num/1000000), t = Math.floor((num%1000000)/1000);
+        return (m ? m+" مليون " : "") + (t ? t+" ألف " : "") + "دينار";
+    }
+
+    function render(filter = 'الكل') {
+        const filtered = filter === 'الكل' ? state.products : state.products.filter(p => p.cat === filter);
+        const html = (p, adm) => `
+            <div class="card">
+                ${adm ? `<button class="delete-btn" onclick="del(${p.id})">حذف</button>` : ''}
+                <img src="${p.img || 'https://via.placeholder.com/150'}">
+                <div class="card-body">
+                    <div class="p-name">${p.name}</div>
+                    <span class="p-price-num">${p.price.toLocaleString()} د.ع</span>
+                    <span class="p-price-text">${formatTxt(p.price)}</span>
+                    ${!adm ? `<button class="btn-submit" style="padding:8px; font-size:12px; margin-top:5px" onclick="order(${p.id})">اطلب</button>` : ''}
+                </div>
+            </div>`;
+        document.getElementById('mainGrid').innerHTML = filtered.map(p => html(p, false)).join('');
+        document.getElementById('adminGrid').innerHTML = state.products.map(p => html(p, true)).join('');
+    }
+
+    function addProduct() {
+        const n = document.getElementById('pName').value, p = parseInt(document.getElementById('pPrice').value), c = document.getElementById('pCat').value;
+        if(n && p && state.tempImg) {
+            state.products.push({id: Date.now(), name:n, price:p, cat:c, img:state.tempImg});
+            save(); render();
+            document.getElementById('pName').value = ""; document.getElementById('pPrice').value = "";
+            document.getElementById('imagePreview').style.display="none"; state.tempImg="";
+            alert("✅ تمت إضافة المادة بنجاح للمنصة");
+        } else {
+            alert("يرجى ملء كافة الحقول ورفع الصورة");
+        }
+    }
+
+    function del(id) { if(confirm("حذف هذه المادة نهائياً؟")) { state.products = state.products.filter(p=>p.id!==id); save(); render(); } }
+
+    function order(id) {
+        const p = state.products.find(x=>x.id===id), ph = prompt("أدخل رقم هاتفك للتواصل:");
+        if(ph) {
+            state.orders.unshift({id: Date.now(), pName: p.name, phone: ph, time: new Date().toLocaleTimeString()});
+            save(); renderOrders(); alert("تم استلام طلبك، سنتصل بك قريباً");
+        }
+    }
+
+    function renderOrders() {
+        document.getElementById('ordersList').innerHTML = state.orders.map(o => `
+            <div class="order-card" style="background:white; padding:15px; border-radius:12px; margin-bottom:10px; border-right:5px solid var(--accent); box-shadow:var(--shadow);">
+                <b>📦 ${o.pName}</b><br><small>📱 ${o.phone} | ⏰ ${o.time}</small>
+                <div style="margin-top:10px">
+                    <a href="tel:${o.phone}" style="color:green; text-decoration:none; font-weight:bold; margin-left:15px">📞 اتصال</a>
+                    <a href="https://wa.me/${o.phone}" style="color:blue; text-decoration:none; font-weight:bold">💬 واتساب</a>
+                </div>
+            </div>`).join('');
+    }
+
+    function switchView(id, btn) {
+        document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    function filterData(c, b) {
+        document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+        b.classList.add('active');
+        render(c);
+    }
+
+    render(); renderOrders();
+</script>
+</body>
+</html>
